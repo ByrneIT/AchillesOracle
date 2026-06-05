@@ -1,7 +1,7 @@
 import importlib
 import pkgutil
-from scanner.checks import __path__ as checks_path
-from scanner.checks.security_score_check import run_check as score_check
+from achillesoracle.scanner.checks import __path__ as checks_path
+from achillesoracle.scanner.checks.security_score_check import run_check as score_check
 
 class ScannerEngine:
     def __init__(self, target_url):
