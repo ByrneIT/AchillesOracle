@@ -14,7 +14,7 @@ Homepage = "https://github.com/ByrneIT/AchillesOracle"
 Repository = "https://github.com/ByrneIT/AchillesOracle"
 
 [project.scripts]
-achillesoracle = "achllesoacle.scanner.cli:main"
+achillesoracle = "achillesoracle.scanner.cli:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
