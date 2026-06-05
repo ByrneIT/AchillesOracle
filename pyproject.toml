@@ -1,0 +1,21 @@
+[project]
+name = "achillesoracle"
+version = "0.1.0"
+description = "AchillesOracle — a modular website security scanner with scoring and reporting."
+authors = [
+    { name="Allen", email="allen@byrnehost.me" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/ByrneIT/AchillesOracle"
+Repository = "https://github.com/ByrneIT/AchillesOracle"
+
+[project.scripts]
+achillesoracle = "scanner.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
