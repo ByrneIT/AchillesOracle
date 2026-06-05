@@ -1,6 +1,6 @@
 import argparse
-from scanner.engine import ScannerEngine
-from scanner.report import ReportBuilder
+from achillesoracle.scanner.engine import ScannerEngine
+from achillesoracle.scanner.report import ReportBuilder
 
 def main():
     parser = argparse.ArgumentParser(description="Website Security Scanner")
