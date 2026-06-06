@@ -3,6 +3,7 @@ import pkgutil
 from achillesoracle.scanner.checks import __path__ as checks_path
 from achillesoracle.scanner.checks.security_score_check import run_check as score_check
 
+
 class ScannerEngine:
     def __init__(self, target_url):
         self.target_url = target_url
@@ -12,7 +13,8 @@ class ScannerEngine:
         checks = []
         for module_info in pkgutil.iter_modules(checks_path):
             module_name = module_info.name
-            module = importlib.import_module(f"scanner.checks.{module_name}")
+            module = importlib.import_module(
+                f"achillesoracle.scanner.checks.{module_name}")
             if hasattr(module, "run_check"):
                 checks.append(module.run_check)
         return checks
