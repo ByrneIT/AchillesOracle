@@ -14,11 +14,12 @@ Homepage = "https://github.com/ByrneIT/AchillesOracle"
 Repository = "https://github.com/ByrneIT/AchillesOracle"
 
 [project.scripts]
-achillesoracle = "achillesoracle.scanner.cli:main"
+achillesoracle = "achillesoracle.scanner.checks.cli:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["achillesoracle"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["achillesoracle*"]
