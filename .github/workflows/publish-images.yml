@@ -54,6 +54,24 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/achillesoracle-frontend:${{ env.IMAGE_TAG }}
             ghcr.io/${{ github.repository_owner }}/achillesoracle-frontend:latest
 
+      - name: Scan GHCR backend image with Trivy
+        uses: aquasecurity/trivy-action@v0.10.1
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/achillesoracle-backend:${{ env.IMAGE_TAG }}
+          format: 'table'
+          exit-code: '1'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Scan GHCR frontend image with Trivy
+        uses: aquasecurity/trivy-action@v0.10.1
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/achillesoracle-frontend:${{ env.IMAGE_TAG }}
+          format: 'table'
+          exit-code: '1'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
       - name: Log in to Docker Hub (optional)
         if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
         uses: docker/login-action@v2
