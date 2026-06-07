@@ -1,6 +1,7 @@
 from pydantic import BaseSettings, AnyHttpUrl
-from typing import Optional, Any
+from typing import Optional, Any, List
 import os
+import logging
 
 
 class Settings(BaseSettings):
@@ -11,6 +12,7 @@ class Settings(BaseSettings):
     """
 
     APP_ENV: str = "production"
+    DEBUG: bool = False
     SECRET_KEY: Optional[str] = None
     VAULT_ADDR: Optional[AnyHttpUrl] = None
     VAULT_TOKEN: Optional[str] = None
@@ -19,6 +21,7 @@ class Settings(BaseSettings):
     REDIS_URL: Optional[str] = None
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
+    ALLOWED_HOSTS: List[str] = []
 
     class Config:
         env_file = ".env"
@@ -64,3 +67,40 @@ def get_secret(name: str, vault_path: Optional[str] = None) -> Optional[str]:
             return None
 
     return None
+
+
+# Post-load resolution and sanity checks
+# Try to resolve SECRET_KEY from environment or Vault if not provided,
+# and enforce that production deployments have a SECRET_KEY set.
+_logger = logging.getLogger(__name__)
+if not settings.SECRET_KEY:
+    _env_secret = os.getenv("SECRET_KEY")
+    if _env_secret:
+        try:
+            setattr(settings, "SECRET_KEY", _env_secret)
+        except Exception:
+            _logger.warning(
+                "Unable to assign SECRET_KEY from environment to settings")
+    elif settings.VAULT_ADDR and settings.VAULT_TOKEN:
+        try:
+            from .vault_client import fetch_secret
+
+            _vault_data = fetch_secret("SECRET_KEY")
+            if isinstance(_vault_data, dict):
+                _vault_secret = _vault_data.get("SECRET_KEY") or _vault_data.get(
+                    "value") or (next(iter(_vault_data.values())) if _vault_data else None)
+            else:
+                _vault_secret = _vault_data
+            if _vault_secret:
+                try:
+                    setattr(settings, "SECRET_KEY", _vault_secret)
+                except Exception:
+                    _logger.warning(
+                        "Unable to assign SECRET_KEY from Vault to settings")
+        except Exception:
+            _logger.warning(
+                "Vault lookup for SECRET_KEY failed; continuing without secret")
+
+if settings.APP_ENV and settings.APP_ENV.lower() == "production" and not settings.SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY must be set in production (provide SECRET_KEY env var or configure Vault)")
