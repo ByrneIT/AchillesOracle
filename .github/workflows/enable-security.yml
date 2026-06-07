@@ -1,0 +1,46 @@
+name: Enable repository security features
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  security-events: write
+
+jobs:
+  enable-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable vulnerability alerts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO=${{ github.repository }}
+          echo "Enabling vulnerability alerts for $REPO"
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPO/vulnerability-alerts")
+          echo "Vulnerability alerts response: $status"
+
+      - name: Enable automated security fixes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO=${{ github.repository }}
+          echo "Enabling automated security fixes for $REPO"
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+            -H "Accept: application/vnd.github.london-preview+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPO/automated-security-fixes")
+          echo "Automated security fixes response: $status"
+
+      - name: Confirm settings
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO=${{ github.repository }}
+          echo "Checking vulnerability alerts status"
+          curl -s -I -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/vulnerability-alerts" | head -n 5 || true
