@@ -1,0 +1,17 @@
+__pycache__
+*.pyc
+env
+venv
+.env
+node_modules
+ui/node_modules
+dist
+.git
+.github
+.idea
+.vscode
+*.pyo
+*.pyd
+build
+dist
+__pycache__

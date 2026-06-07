@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { runScan } from "../api/client";
+import ScoreBadge from "../components/ScoreBadge";
+import IssueCard from "../components/IssueCard";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -8,6 +10,11 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   async function handleScan() {
+    if (!url) {
+      setError("Please enter a URL to scan.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -16,73 +23,63 @@ export default function Home() {
       const data = await runScan(url);
       setResult(data);
     } catch (err) {
+      console.error(err);
       setError("Scan failed. Check the API server.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "Cinzel, serif", color: "var(--aegean)" }}>
-        AchillesOracle
-      </h1>
+    <div className="container">
+      <h1 className="site-title">AchillesOracle</h1>
 
-      <div style={{ marginTop: "1rem" }}>
+      <div className="controls">
         <input
+          className="input"
           type="text"
-          placeholder="Enter URL"
+          placeholder="Enter URL (https://example.com)"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          style={{
-            width: "300px",
-            padding: "8px",
-            border: "1px solid var(--slate)",
-            borderRadius: "4px"
-          }}
         />
 
-        <button
-          onClick={handleScan}
-          style={{
-            marginLeft: "1rem",
-            padding: "8px 16px",
-            background: "var(--aegean)",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
-        >
-          Run Scan
+        <button className="btn" onClick={handleScan} disabled={loading}>
+          {loading ? "Scanning…" : "Run Scan"}
         </button>
       </div>
 
-      {loading && (
-        <p style={{ marginTop: "1.5rem", color: "var(--slate)" }}>
-          Running scan...
-        </p>
-      )}
-
       {error && (
-        <p style={{ marginTop: "1.5rem", color: "var(--imperial-red)" }}>
-          {error}
-        </p>
+        <p style={{ marginTop: "1rem", color: "var(--imperial-red)" }}>{error}</p>
       )}
 
       {result && (
-        <pre
-          style={{
-            marginTop: "2rem",
-            padding: "1rem",
-            background: "white",
-            borderRadius: "6px",
-            border: "1px solid var(--slate)",
-            overflowX: "auto"
-          }}
-        >
-          {JSON.stringify(result, null, 2)}
-        </pre>
+        <div className="card">
+          <div className="result-grid">
+            <div style={{ flex: "0 0 320px" }}>
+              <ScoreBadge score={result.score ?? 0} grade={result.grade ?? "-"} />
+              <div style={{ marginTop: "0.6rem" }} className="meta">
+                <div>
+                  <strong>URL:</strong> {result.url}
+                </div>
+                <div style={{ marginTop: "0.4rem" }}>
+                  Passed: <strong>{result.passed ?? 0}</strong> 
+                  Warnings: <strong>{result.warnings ?? 0}</strong> 
+                  Errors: <strong>{result.errors ?? 0}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ flex: "1 1 540px" }}>
+              <div className="issue-list">
+                {Array.isArray(result.issues) && result.issues.length > 0 ? (
+                  result.issues.map((iss, idx) => <IssueCard key={idx} issue={iss} />)
+                ) : (
+                  <p className="small-muted">No detailed issues returned.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

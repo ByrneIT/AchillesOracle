@@ -1,0 +1,16 @@
+:root {
+	/* Greco-Roman palette (five core colors) */
+	--marble: #F6F5F0; /* soft off-white / marble */
+	--aegean: #2D6A6B; /* blue-green (Aegean) */
+	--aegean-dark: #234E4F;
+	--imperial-red: #8C1D18; /* deep imperial red */
+	--olive: #78866B; /* muted olive */
+	--slate: #5B6770; /* neutral slate */
+	--muted: #8B8E90;
+
+	/* UI helpers */
+	--card-bg: #fff;
+	--card-border: rgba(41,79,80,0.08);
+	--shadow: 0 10px 30px rgba(18,25,28,0.06);
+	--glass: rgba(255,255,255,0.6);
+}

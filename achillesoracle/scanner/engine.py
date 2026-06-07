@@ -13,6 +13,10 @@ class ScannerEngine:
         checks = []
         for module_info in pkgutil.iter_modules(checks_path):
             module_name = module_info.name
+            # Skip the aggregator/scoring module so it isn't executed as a normal check
+            if module_name == "security_score_check":
+                continue
+
             module = importlib.import_module(
                 f"achillesoracle.scanner.checks.{module_name}")
             if hasattr(module, "run_check"):
