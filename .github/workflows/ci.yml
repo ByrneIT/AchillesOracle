@@ -36,7 +36,8 @@ jobs:
         uses: aquasecurity/trivy-action@v0.10.1
         with:
           image-ref: achillesoracle-backend:latest
-          format: 'table'
+          format: 'json'
+          output: 'trivy-backend.json'
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
@@ -44,7 +45,55 @@ jobs:
         uses: aquasecurity/trivy-action@v0.10.1
         with:
           image-ref: achillesoracle-frontend:latest
-          format: 'table'
+          format: 'json'
+          output: 'trivy-frontend.json'
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Upload Trivy backend report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-backend-report
+          path: trivy-backend.json
+      - name: Upload Trivy frontend report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-frontend-report
+          path: trivy-frontend.json
+      - name: Generate Trivy summary
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          python - <<'PY'
+          import json
+          def summarize(path):
+              try:
+                  with open(path) as f:
+                      data=json.load(f)
+              except Exception:
+                  return {'CRITICAL':0,'HIGH':0,'MEDIUM':0,'LOW':0,'UNKNOWN':0}
+              counts={'CRITICAL':0,'HIGH':0,'MEDIUM':0,'LOW':0,'UNKNOWN':0}
+              for res in data.get('Results',[]):
+                  for v in res.get('Vulnerabilities') or []:
+                      sev=v.get('Severity','UNKNOWN')
+                      counts[sev]=counts.get(sev,0)+1
+              return counts
+          b=summarize('trivy-backend.json')
+          f=summarize('trivy-frontend.json')
+          with open('trivy-summary.md','w') as out:
+              out.write('## Trivy vulnerability summary\n\n')
+              out.write('**Backend**\n')
+              for s in ['CRITICAL','HIGH','MEDIUM','LOW','UNKNOWN']:
+                  out.write(f'- {s}: {b.get(s,0)}\n')
+              out.write('\n**Frontend**\n')
+              for s in ['CRITICAL','HIGH','MEDIUM','LOW','UNKNOWN']:
+                  out.write(f'- {s}: {f.get(s,0)}\n')
+          PY
+      - name: Comment Trivy summary
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: trivy-summary.md
+          header: Trivy vulnerability summary
+          edit-mode: replace

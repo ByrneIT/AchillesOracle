@@ -58,7 +58,8 @@ jobs:
         uses: aquasecurity/trivy-action@v0.10.1
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/achillesoracle-backend:${{ env.IMAGE_TAG }}
-          format: 'table'
+          format: 'json'
+          output: 'trivy-backend.json'
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
@@ -67,10 +68,23 @@ jobs:
         uses: aquasecurity/trivy-action@v0.10.1
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/achillesoracle-frontend:${{ env.IMAGE_TAG }}
-          format: 'table'
+          format: 'json'
+          output: 'trivy-frontend.json'
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+
+      - name: Upload GHCR Trivy backend report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-backend-${{ env.IMAGE_TAG }}
+          path: trivy-backend.json
+
+      - name: Upload GHCR Trivy frontend report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-frontend-${{ env.IMAGE_TAG }}
+          path: trivy-frontend.json
 
       - name: Log in to Docker Hub (optional)
         if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
