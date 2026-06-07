@@ -8,6 +8,10 @@ services:
       - "8000:8000"
     environment:
       - PORT=8000
+      - APP_ENV=production
+      - SECRET_KEY
+      - VAULT_ADDR
+      - VAULT_TOKEN
     restart: unless-stopped
     restart: unless-stopped
     healthcheck:
@@ -22,3 +26,5 @@ services:
     ports:
       - "3000:80"
     restart: unless-stopped
+    environment:
+      - APP_ENV=production
