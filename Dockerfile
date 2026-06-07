@@ -1,5 +1,5 @@
 ## Multi-stage build: compile dependencies in builder and produce small runtime image
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 
@@ -19,7 +19,7 @@ RUN python -m pip install --no-cache-dir --prefix=/install -r requirements.txt
 COPY . /app
 
 ## Final runtime image
-FROM python:3.11-slim AS runtime
+FROM python:3.14-slim AS runtime
 ENV PYTHONUNBUFFERED=1
 ENV PATH=/install/bin:$PATH
 
