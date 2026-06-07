@@ -1,0 +1,4 @@
+# Development/test dependencies
+pytest
+pip-tools
+build
