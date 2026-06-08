@@ -1,12 +1,15 @@
 import argparse
+import sys
 from achillesoracle.scanner.engine import ScannerEngine
 from achillesoracle.scanner.report import ReportBuilder
+
 
 def main():
     parser = argparse.ArgumentParser(description="Website Security Scanner")
     parser.add_argument("url", help="Target URL to scan")
 
-    parser.add_argument("--json", action="store_true", help="Output JSON report")
+    parser.add_argument("--json", action="store_true",
+                        help="Output JSON report")
     parser.add_argument("--markdown", help="Output Markdown report to file")
     parser.add_argument("--html", help="Output HTML report to file")
     parser.add_argument("--output", help="Output file for JSON")
@@ -47,5 +50,10 @@ def main():
             f.write(report.to_html())
         print(f"HTML report saved to {args.html}")
 
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Fatal error during scan: {e}")
+        sys.exit(1)

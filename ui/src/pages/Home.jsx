@@ -41,6 +41,11 @@ export default function Home() {
           placeholder="Enter URL (https://example.com)"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleScan();
+            }
+          }}
         />
 
         <button className="btn" onClick={handleScan} disabled={loading}>
