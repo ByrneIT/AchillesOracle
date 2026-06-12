@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.so
+*.dylib
+
+# Secrets & environment
+.env
+.env.*
+!.env.example
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.log
+
+# Node / frontend
+node_modules/
+ui/dist/
+ui/.vite/
+ui/node_modules/
+
+# Docker build artifacts
+*.tar
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Certificates & keys
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# Pip-tools compiled output (keep requirements.txt, ignore lock backups)
+pip-*.json

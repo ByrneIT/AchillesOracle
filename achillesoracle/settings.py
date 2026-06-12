@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, AnyHttpUrl
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings
 from typing import Optional, Any, List
 import os
 import logging
@@ -22,6 +23,12 @@ class Settings(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
     ALLOWED_HOSTS: List[str] = []
+
+    # Stripe — leave blank until paywall goes live; plug in keys when ready
+    STRIPE_SECRET_KEY: Optional[str] = None
+    STRIPE_PUBLISHABLE_KEY: Optional[str] = None
+    STRIPE_WEBHOOK_SECRET: Optional[str] = None
+    STRIPE_PRICE_ID: Optional[str] = None  # the Price ID for your subscription plan
 
     class Config:
         env_file = ".env"
@@ -53,25 +60,20 @@ def get_secret(name: str, vault_path: Optional[str] = None) -> Optional[str]:
     # 2) try Vault
     if settings.VAULT_ADDR and settings.VAULT_TOKEN:
         try:
-            # import here to avoid circular imports when module is imported
             from .vault_client import fetch_secret
 
             path = vault_path or name.lower()
             data = fetch_secret(path)
             if isinstance(data, dict):
-                # try exact key, common 'value', or first item
                 return data.get(name) or data.get("value") or (next(iter(data.values())) if data else None)
             return data
         except Exception:
-            # avoid raising at import time; callers can handle missing secrets
             return None
 
     return None
 
 
 # Post-load resolution and sanity checks
-# Try to resolve SECRET_KEY from environment or Vault if not provided,
-# and enforce that production deployments have a SECRET_KEY set.
 _logger = logging.getLogger(__name__)
 if not settings.SECRET_KEY:
     _env_secret = os.getenv("SECRET_KEY")

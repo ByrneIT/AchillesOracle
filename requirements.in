@@ -3,3 +3,5 @@ requests
 fastapi
 uvicorn
 beautifulsoup4
+pydantic-settings
+slowapi

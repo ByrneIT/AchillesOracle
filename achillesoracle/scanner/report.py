@@ -1,4 +1,6 @@
 import json
+import html as _html
+
 
 class ReportBuilder:
     def __init__(self, url, results):
@@ -14,7 +16,7 @@ class ReportBuilder:
                 if "Score:" in details:
                     try:
                         return int(details.split("Score:")[1].split("/")[0].strip())
-                    except:
+                    except Exception:
                         return 0
         return 0
 
@@ -25,7 +27,7 @@ class ReportBuilder:
                 if "Grade:" in details:
                     try:
                         return details.split("Grade:")[1].split()[0].strip()
-                    except:
+                    except Exception:
                         return "F"
         return "F"
 
@@ -75,22 +77,23 @@ class ReportBuilder:
         return "\n".join(md)
 
     def to_html(self):
+        esc = _html.escape
         html = []
         html.append("<html><head><title>Security Scan Report</title></head><body>")
-        html.append(f"<h1>Security Scan Report for {self.url}</h1>")
-        html.append(f"<p><strong>Score:</strong> {self.score}/100</p>")
-        html.append(f"<p><strong>Grade:</strong> {self.grade}</p>")
+        html.append(f"<h1>Security Scan Report for {esc(str(self.url))}</h1>")
+        html.append(f"<p><strong>Score:</strong> {esc(str(self.score))}/100</p>")
+        html.append(f"<p><strong>Grade:</strong> {esc(str(self.grade))}</p>")
 
         html.append("<h2>Summary</h2>")
-        html.append(f"<p>{self.summary()}</p>")
+        html.append(f"<p>{esc(self.summary())}</p>")
 
         html.append("<h2>Findings</h2>")
         for result in self.results:
-            name = result.get("name", "Unknown Check")
-            status = result.get("status", "unknown")
-            severity = result.get("severity", "unknown")
-            details = result.get("details", "")
-            recommendation = result.get("recommendation", "")
+            name = esc(result.get("name", "Unknown Check"))
+            status = esc(result.get("status", "unknown"))
+            severity = esc(result.get("severity", "unknown"))
+            details = esc(result.get("details", ""))
+            recommendation = esc(result.get("recommendation", ""))
 
             html.append("<div style='margin-bottom:20px;'>")
             html.append(f"<h3>{name}</h3>")
