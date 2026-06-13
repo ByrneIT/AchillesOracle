@@ -46,3 +46,6 @@ Notes
 - During development the Vite dev server proxies `/scan` and `/report` to the backend (`127.0.0.1:8000`).
 - If you see a blank page, ensure `ui/index.html` exists (Vite needs a processed index for the dev client).
 
+Licensed under the AchillesOracle Source License (AOSL‑1.0). See LICENSE for details.
+
+
